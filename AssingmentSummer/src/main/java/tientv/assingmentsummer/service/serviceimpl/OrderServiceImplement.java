@@ -31,24 +31,26 @@ public class OrderServiceImplement implements IOrderService {
     @Autowired
     private OrderDetailsRepository orderDetailsRepository;
 
+    //Method add one Order
     @Override
-    @Transactional(rollbackFor = {Exception.class, Throwable.class}, timeout = 150)
+    @Transactional(rollbackFor = {Exception.class, Throwable.class}, timeout = 50)
     public Orders createOder(OrderDTO orderDTO) throws CustomExceptionHandler {
         Double totalAmount = 0.0;
 
         Orders order = new Orders();
         if (orderDTO == null) {
-            return null;
+            throw new CustomExceptionHandler("Orders can't Null");
         }
         if (orderDTO.getCustomerName() == null || orderDTO.getAddress() == null || orderDTO.getPhone() == null) {
-            return null;
+            throw new CustomExceptionHandler("Please fill in all necessary information");
         }
+        //Format yyyy-MM-dd
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDate = now.format(formatter);
         LocalDate localDate = LocalDate.parse(formattedDate, formatter);
         LocalDateTime formattedLocalDateTime = localDate.atStartOfDay();
-
+        //Setup create one Order
         order.setOrderDate(formattedLocalDateTime);
         order.setStatus("Order Success");
         order.setCustomerName(orderDTO.getCustomerName());
@@ -57,7 +59,7 @@ public class OrderServiceImplement implements IOrderService {
         order.setEmail(orderDTO.getEmail());
         order.setTotalAmount(totalAmount);
         Orders order1 = orderRepository.save(order);
-        //Thêm sản phẩm vào oder details.
+        //Add product for oder details.
         if (order1 != null) {
             for (ProductDTO pDTO : orderDTO.getLstProduct()) {
                 Product pEntity = productRepository.findProductById(pDTO.getId());
@@ -77,7 +79,7 @@ public class OrderServiceImplement implements IOrderService {
     @Override
     public Orders getOrderByID(Long idOrder) throws CustomExceptionHandler {
         if (idOrder < 0) {
-            return null;
+            throw new CustomExceptionHandler("Invalid Orders id");
         }
         return orderRepository.findById(idOrder).get();
     }
@@ -85,17 +87,20 @@ public class OrderServiceImplement implements IOrderService {
     @Override
     public Orders updateOrder(Long id, OrderDTO orderRequest) throws CustomExceptionHandler {
         Orders order = getOrderByID(id);
-        if (order == null) {
-            return null;
+        if (orderRequest == null) {
+            throw new CustomExceptionHandler("Orders can't Null");
         }
-
+        if (orderRequest.getCustomerName() == null || orderRequest.getAddress() == null || orderRequest.getPhone() == null) {
+            throw new CustomExceptionHandler("Please fill in all necessary information");
+        }
+        //Format yyyy-MM-dd
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         String formattedDate = now.format(formatter);
         LocalDate localDate = LocalDate.parse(formattedDate, formatter);
-
         LocalDateTime formattedLocalDateTime = localDate.atStartOfDay();
 
+        //Setup update one Order
         order.setOrderDate(formattedLocalDateTime);
         order.setCustomerName(orderRequest.getCustomerName());
         order.setAddress(orderRequest.getAddress());
@@ -138,7 +143,7 @@ public class OrderServiceImplement implements IOrderService {
             Optional<Orders> order = orderRepository.findById(number);
             lst_orders.add(order.get());
         } catch (NumberFormatException e) {
-            System.out.println("Invalid string format for conversion to long: " + text);
+            System.out.println("Invalid Orders id");
         }
         return lst_orders;
     }

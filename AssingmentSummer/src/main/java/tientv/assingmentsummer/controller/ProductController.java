@@ -115,7 +115,7 @@ public class ProductController {
             );
         } catch (CustomExceptionHandler ex) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(
-                    new ResponseObject("FAILED", "Delete Product failed", null)
+                    new ResponseObject("FAILED", ex.getMessage(), null)
             );
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.OK).body(
