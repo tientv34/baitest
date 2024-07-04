@@ -1,0 +1,2 @@
+- Cài đặt jdk 17.
+- Chạy trên IntelliJ IDEA 2024.1.4.
